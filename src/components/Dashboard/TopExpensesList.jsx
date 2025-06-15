@@ -1,3 +1,4 @@
+// src/components/Dashboard/TopExpensesList.jsx
 import React from 'react';
 import { formatCurrency } from '../../utils/format';
 
@@ -6,8 +7,8 @@ const TopExpensesList = ({ expenses }) => {
     return (
       <div className="chart-wrapper">
         <h3>Top 5 Expenses</h3>
-        <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
-          No expenses recorded yet
+        <div className="empty-state">
+          <p>No expenses recorded yet</p>
         </div>
       </div>
     );
@@ -19,12 +20,16 @@ const TopExpensesList = ({ expenses }) => {
       <div className="top-expenses-list">
         {expenses.map((expense, index) => (
           <div key={expense.id} className="expense-item">
-            <span className="rank">{index + 1}.</span>
-            <div className="expense-details">
-              <span className="category">{expense.category}</span>
-              {expense.notes && <span className="notes">• {expense.notes}</span>}
+            <div className="rank">{index + 1}</div>
+            <div className="expense-content">
+              <div className="expense-main">
+                <span className="category">{expense.category}</span>
+                <span className="amount">{formatCurrency(expense.amount, expense.currency)}</span>
+              </div>
+              {expense.notes && (
+                <div className="expense-notes">{expense.notes}</div>
+              )}
             </div>
-            <span className="amount">{formatCurrency(expense.amount, expense.currency)}</span>
           </div>
         ))}
       </div>

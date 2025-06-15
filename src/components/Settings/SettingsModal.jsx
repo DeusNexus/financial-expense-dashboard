@@ -1,3 +1,4 @@
+// src/components/Settings/SettingsModal.jsx
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { useApp } from '../../context/AppContext';
@@ -35,10 +36,38 @@ const SettingsModal = ({ isOpen, onClose }) => {
               defaultCurrency: e.target.value
             })}
           >
-            <option value="EUR">EUR (€)</option>
             <option value="IDR">IDR (Rp)</option>
+            <option value="EUR">EUR (€)</option>
             <option value="USD">USD ($)</option>
           </select>
+        </div>
+
+        <div className="setting-group">
+          <label>EUR/IDR Exchange Rate:</label>
+          <input
+            type="number"
+            value={localSettings.exchangeRate}
+            onChange={(e) => setLocalSettings({
+              ...localSettings,
+              exchangeRate: parseFloat(e.target.value) || 16500
+            })}
+            placeholder="16500"
+          />
+          <small>Enter IDR amount per 1 EUR</small>
+        </div>
+
+        <div className="setting-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={localSettings.showEurEquivalent}
+              onChange={(e) => setLocalSettings({
+                ...localSettings,
+                showEurEquivalent: e.target.checked
+              })}
+            />
+            Show EUR equivalent for amounts
+          </label>
         </div>
 
         <div className="setting-group">

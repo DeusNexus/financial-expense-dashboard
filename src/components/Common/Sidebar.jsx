@@ -1,3 +1,4 @@
+// src/components/Common/Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
@@ -8,6 +9,8 @@ const Sidebar = ({ collapsed, onToggle, onSettingsClick }) => {
   const menuItems = [
     { path: '/', icon: '🏠', label: 'Dashboard' },
     { path: '/expenses', icon: '💰', label: 'Expenses' },
+    { path: '/recurring', icon: '🔄', label: 'Recurring' },
+    { path: '/planned', icon: '📅', label: 'Planned' },
     { path: '/goals', icon: '🎯', label: 'Goals' },
     { path: '/import-export', icon: '📁', label: 'Import/Export' },
   ];

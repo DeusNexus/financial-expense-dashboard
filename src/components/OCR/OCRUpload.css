@@ -1,0 +1,35 @@
+/* Update src/components/OCR/OCRUpload.css */
+.demo-warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.demo-warning p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.processing-status {
+  text-align: center;
+  margin: 15px 0;
+  color: #007bff;
+}

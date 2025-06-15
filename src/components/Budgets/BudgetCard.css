@@ -1,0 +1,67 @@
+/* src/components/Budgets/BudgetCard.css */
+.budget-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.budget-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.budget-amount {
+  font-weight: bold;
+  color: #2196f3;
+}
+
+.eur-equivalent {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  font-weight: normal;
+}
+
+.budget-progress {
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+.overspent-alert {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+}

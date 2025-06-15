@@ -1,9 +1,12 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Sidebar from './components/Common/Sidebar.jsx';
 import DashboardPage from './components/Dashboard/DashboardPage.jsx';
 import ExpensesPage from './components/Expenses/ExpensesPage.jsx';
+import RecurringExpensesPage from './components/Recurring/RecurringExpensesPage.jsx';
+import PlannedExpensesPage from './components/Planned/PlannedExpensesPage.jsx';
 import GoalsPage from './components/Goals/GoalsPage.jsx';
 import ImportExportPage from './components/ImportExport/ImportExportPage.jsx';
 import SettingsModal from './components/Settings/SettingsModal.jsx';
@@ -44,6 +47,8 @@ function App() {
             <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/recurring" element={<RecurringExpensesPage />} />
+              <Route path="/planned" element={<PlannedExpensesPage />} />
               <Route path="/goals" element={<GoalsPage />} />
               <Route path="/import-export" element={<ImportExportPage />} />
             </Routes>

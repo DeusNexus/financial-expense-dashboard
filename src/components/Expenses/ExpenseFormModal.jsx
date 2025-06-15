@@ -1,14 +1,17 @@
+// src/components/Expenses/ExpenseFormModal.jsx
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import DatePicker from 'react-datepicker';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { useApp } from '../../context/AppContext';
-import { EXPENSE_CATEGORIES, CURRENCIES } from '../../utils/constants';
+import { CURRENCIES } from '../../utils/constants';
+import { formatInputNumber, parseInputNumber } from '../../utils/format';
+import OCRUpload from '../OCR/OCRUpload';
 import 'react-datepicker/dist/react-datepicker.css';
 import './ExpenseFormModal.css';
 
 const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
-  const { addExpense, updateExpense, settings } = useApp();
+  const { addExpense, updateExpense, settings, expenses } = useApp();
   
   const [formData, setFormData] = useState({
     amount: '',
@@ -17,10 +20,20 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
     currency: settings.defaultCurrency,
     type: 'expense',
     notes: '',
-    recurring: false
+    recurring: false,
+    receiptImage: null
   });
 
   const [errors, setErrors] = useState({});
+  const [showOCR, setShowOCR] = useState(false);
+  const [formattedAmount, setFormattedAmount] = useState('');
+
+  // Get existing categories from expenses
+  const existingCategories = [...new Set(expenses.map(e => e.category).filter(Boolean))];
+  const categoryOptions = existingCategories.map(cat => ({
+    value: cat,
+    label: cat
+  }));
 
   useEffect(() => {
     if (expense) {
@@ -28,6 +41,7 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
         ...expense,
         date: new Date(expense.date)
       });
+      setFormattedAmount(formatInputNumber(expense.amount.toString()));
     } else {
       setFormData({
         amount: '',
@@ -36,15 +50,12 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
         currency: settings.defaultCurrency,
         type: 'expense',
         notes: '',
-        recurring: false
+        recurring: false,
+        receiptImage: null
       });
+      setFormattedAmount('');
     }
   }, [expense, settings.defaultCurrency, isOpen]);
-
-  const categoryOptions = EXPENSE_CATEGORIES.map(cat => ({
-    value: cat,
-    label: cat
-  }));
 
   const currencyOptions = CURRENCIES.map(curr => ({
     value: curr.code,
@@ -54,7 +65,8 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+    const numericAmount = parseInputNumber(formattedAmount);
+    if (!formattedAmount || numericAmount <= 0) {
       newErrors.amount = 'Amount must be greater than 0';
     }
     
@@ -73,7 +85,7 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
 
     const expenseData = {
       ...formData,
-      amount: parseFloat(formData.amount),
+      amount: parseInputNumber(formattedAmount),
       date: formData.date.toISOString()
     };
 
@@ -93,6 +105,31 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
     }
   };
 
+  const handleAmountChange = (e) => {
+    const formatted = formatInputNumber(e.target.value);
+    setFormattedAmount(formatted);
+    if (errors.amount) {
+      setErrors(prev => ({ ...prev, amount: null }));
+    }
+  };
+
+  const handleOCRData = async (ocrData) => {
+    const data = await ocrData;
+    setFormData(prev => ({
+      ...prev,
+      ...data,
+      date: data.date || prev.date
+    }));
+    setFormattedAmount(formatInputNumber(data.amount.toString()));
+    setShowOCR(false);
+  };
+
+  const handleCategoryCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    handleInputChange('category', inputValue);
+    return newOption;
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -106,114 +143,151 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
         <button className="close-button" onClick={onClose}>×</button>
       </div>
 
-      <form onSubmit={handleSubmit} className="expense-form">
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="amount">Amount *</label>
-            <input
-              id="amount"
-              type="number"
-              step="0.01"
-              value={formData.amount}
-              onChange={(e) => handleInputChange('amount', e.target.value)}
-              className={errors.amount ? 'error' : ''}
-              placeholder="0.00"
-            />
-            {errors.amount && <span className="error-text">{errors.amount}</span>}
+      {showOCR ? (
+        <OCRUpload 
+          onDataExtracted={handleOCRData}
+          onClose={() => setShowOCR(false)}
+        />
+      ) : (
+        <form onSubmit={handleSubmit} className="expense-form">
+          <div className="form-actions-top">
+            <button 
+              type="button" 
+              onClick={() => setShowOCR(true)}
+              className="btn-secondary"
+            >
+              📷 Scan Receipt (Demo)
+            </button>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="currency">Currency</label>
-            <Select
-              options={currencyOptions}
-              value={currencyOptions.find(opt => opt.value === formData.currency)}
-              onChange={(option) => handleInputChange('currency', option.value)}
-              className="select-container"
-              classNamePrefix="select"
-            />
-          </div>
-        </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="amount">Amount *</label>
+              <div className="amount-input-container">
+                <span className="currency-prefix">
+                  {formData.currency === 'IDR' ? 'Rp' : 
+                   formData.currency === 'EUR' ? '€' : '$'}
+                </span>
+                <input
+                  id="amount"
+                  type="text"
+                  value={formattedAmount}
+                  onChange={handleAmountChange}
+                  className={errors.amount ? 'error' : ''}
+                  placeholder={formData.currency === 'IDR' ? '1.000.000' : '1000.00'}
+                />
+              </div>
+              {errors.amount && <span className="error-text">{errors.amount}</span>}
+            </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="category">Category *</label>
-            <Select
-              options={categoryOptions}
-              value={categoryOptions.find(opt => opt.value === formData.category)}
-              onChange={(option) => handleInputChange('category', option.value)}
-              className={`select-container ${errors.category ? 'error' : ''}`}
-              classNamePrefix="select"
-              isCreatable
-            />
-            {errors.category && <span className="error-text">{errors.category}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="date">Date</label>
-            <DatePicker
-              selected={formData.date}
-              onChange={(date) => handleInputChange('date', date)}
-              className="date-picker"
-              dateFormat="dd/MM/yyyy"
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="type">Type</label>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                value="expense"
-                checked={formData.type === 'expense'}
-                onChange={(e) => handleInputChange('type', e.target.value)}
+            <div className="form-group">
+              <label htmlFor="currency">Currency</label>
+              <CreatableSelect
+                options={currencyOptions}
+                value={currencyOptions.find(opt => opt.value === formData.currency)}
+                onChange={(option) => handleInputChange('currency', option.value)}
+                className="select-container"
+                classNamePrefix="select"
+                isSearchable={false}
               />
-              Expense
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="income"
-                checked={formData.type === 'income'}
-                onChange={(e) => handleInputChange('type', e.target.value)}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="category">Category *</label>
+              <CreatableSelect
+                options={categoryOptions}
+                value={categoryOptions.find(opt => opt.value === formData.category)}
+                onChange={(option) => handleInputChange('category', option.value)}
+                onCreateOption={handleCategoryCreate}
+                className={`select-container ${errors.category ? 'error' : ''}`}
+                classNamePrefix="select"
+                placeholder="Select or create category..."
               />
-              Income
+              {errors.category && <span className="error-text">{errors.category}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="date">Date</label>
+              <DatePicker
+                selected={formData.date}
+                onChange={(date) => handleInputChange('date', date)}
+                className="date-picker"
+                dateFormat="dd/MM/yyyy"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="type">Type</label>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  value="expense"
+                  checked={formData.type === 'expense'}
+                  onChange={(e) => handleInputChange('type', e.target.value)}
+                />
+                Expense
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="income"
+                  checked={formData.type === 'income'}
+                  onChange={(e) => handleInputChange('type', e.target.value)}
+                />
+                Income
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="notes">Notes</label>
+            <textarea
+              id="notes"
+              value={formData.notes}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
+              placeholder="Optional notes..."
+              rows="3"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={formData.recurring}
+                onChange={(e) => handleInputChange('recurring', e.target.checked)}
+              />
+              Make this recurring (monthly)
             </label>
           </div>
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="notes">Notes</label>
-          <textarea
-            id="notes"
-            value={formData.notes}
-            onChange={(e) => handleInputChange('notes', e.target.value)}
-            placeholder="Optional notes..."
-            rows="3"
-          />
-        </div>
+          {formData.receiptImage && (
+            <div className="receipt-preview">
+              <img src={formData.receiptImage} alt="Receipt" />
+              <button 
+                type="button" 
+                onClick={() => handleInputChange('receiptImage', null)}
+                className="remove-image"
+              >
+                Remove Image
+              </button>
+            </div>
+          )}
 
-        <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={formData.recurring}
-              onChange={(e) => handleInputChange('recurring', e.target.checked)}
-            />
-            Make this recurring (monthly)
-          </label>
-        </div>
-
-        <div className="form-actions">
-          <button type="button" onClick={onClose} className="btn-secondary">
-            Cancel
-          </button>
-          <button type="submit" className="btn-primary">
-            {expense ? 'Update' : 'Add'} Expense
-          </button>
-        </div>
-      </form>
+          <div className="form-actions">
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              {expense ? 'Update' : 'Add'} Expense
+            </button>
+          </div>
+        </form>
+      )}
     </Modal>
   );
 };
