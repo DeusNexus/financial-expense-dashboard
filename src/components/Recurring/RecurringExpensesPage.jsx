@@ -1,5 +1,6 @@
 // src/components/Recurring/RecurringExpensesPage.jsx
 import React, { useState } from 'react';
+import CreatableSelect from 'react-select/creatable';
 import { useApp } from '../../context/AppContext';
 import { formatDate, formatCurrency } from '../../utils/format';
 import { EXPENSE_CATEGORIES, RECURRENCE_INTERVALS } from '../../utils/constants';
@@ -11,7 +12,8 @@ const RecurringExpensesPage = () => {
     addRecurringExpense, 
     deleteRecurringExpense, 
     addExpense,
-    getNextDueDate 
+    getNextDueDate,
+    expenses
   } = useApp();
   
   const [showForm, setShowForm] = useState(false);
@@ -23,6 +25,14 @@ const RecurringExpensesPage = () => {
     currency: 'IDR',
     lastPaid: new Date().toISOString().split('T')[0]
   });
+
+  // Get existing categories from expenses
+  const existingCategories = [...new Set(expenses.map(e => e.category).filter(Boolean))];
+  const allCategories = [...new Set([...EXPENSE_CATEGORIES, ...existingCategories])];
+  const categoryOptions = allCategories.map(cat => ({
+    value: cat,
+    label: cat
+  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,6 +66,10 @@ const RecurringExpensesPage = () => {
     };
     
     addExpense(newExpense);
+  };
+
+  const handleCategoryCreate = (inputValue) => {
+    setFormData(prev => ({ ...prev, category: inputValue }));
   };
 
   const upcomingExpenses = recurringExpenses.map(recurring => ({
@@ -162,16 +176,16 @@ const RecurringExpensesPage = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {EXPENSE_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  <CreatableSelect
+                    options={categoryOptions}
+                    value={categoryOptions.find(opt => opt.value === formData.category)}
+                    onChange={(option) => setFormData({...formData, category: option ? option.value : ''})}
+                    onCreateOption={handleCategoryCreate}
+                    className="select-container"
+                    classNamePrefix="select"
+                    placeholder="Select or create category..."
+                    isClearable
+                  />
                 </div>
                 <div className="form-group">
                   <label>Frequency</label>

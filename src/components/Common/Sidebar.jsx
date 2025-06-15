@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 
-const Sidebar = ({ collapsed, onToggle, onSettingsClick }) => {
+const Sidebar = ({ collapsed, onToggle, onSettingsClick, onHelpClick }) => {
   const location = useLocation();
 
   const menuItems = [
@@ -38,6 +38,10 @@ const Sidebar = ({ collapsed, onToggle, onSettingsClick }) => {
       </nav>
 
       <div className="sidebar-footer">
+        <button onClick={onHelpClick} className="settings-btn">
+          <span className="nav-icon">❓</span>
+          {!collapsed && <span className="nav-label">Help</span>}
+        </button>
         <button onClick={onSettingsClick} className="settings-btn">
           <span className="nav-icon">⚙️</span>
           {!collapsed && <span className="nav-label">Settings</span>}

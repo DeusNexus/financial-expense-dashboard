@@ -1,12 +1,13 @@
 // src/components/Planned/PlannedExpensesPage.jsx
 import React, { useState } from 'react';
+import CreatableSelect from 'react-select/creatable';
 import { useApp } from '../../context/AppContext';
 import { formatDate, formatCurrency } from '../../utils/format';
 import { EXPENSE_CATEGORIES } from '../../utils/constants';
 import './PlannedExpensesPage.css';
 
 const PlannedExpensesPage = () => {
-  const { plannedExpenses, addPlannedExpense, deletePlannedExpense, addExpense } = useApp();
+  const { plannedExpenses, addPlannedExpense, deletePlannedExpense, addExpense, expenses } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -16,6 +17,14 @@ const PlannedExpensesPage = () => {
     currency: 'IDR',
     notes: ''
   });
+
+  // Get existing categories from expenses
+  const existingCategories = [...new Set(expenses.map(e => e.category).filter(Boolean))];
+  const allCategories = [...new Set([...EXPENSE_CATEGORIES, ...existingCategories])];
+  const categoryOptions = allCategories.map(cat => ({
+    value: cat,
+    label: cat
+  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -47,6 +56,10 @@ const PlannedExpensesPage = () => {
     
     addExpense(newExpense);
     deletePlannedExpense(plannedExpense.id);
+  };
+
+  const handleCategoryCreate = (inputValue) => {
+    setFormData(prev => ({ ...prev, category: inputValue }));
   };
 
   const sortedPlannedExpenses = [...plannedExpenses].sort((a, b) => 
@@ -151,15 +164,16 @@ const PlannedExpensesPage = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  >
-                    <option value="">Select Category (Optional)</option>
-                    {EXPENSE_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  <CreatableSelect
+                    options={categoryOptions}
+                    value={categoryOptions.find(opt => opt.value === formData.category)}
+                    onChange={(option) => setFormData({...formData, category: option ? option.value : ''})}
+                    onCreateOption={handleCategoryCreate}
+                    className="select-container"
+                    classNamePrefix="select"
+                    placeholder="Select or create category..."
+                    isClearable
+                  />
                 </div>
                 <div className="form-group">
                   <label>Target Date</label>

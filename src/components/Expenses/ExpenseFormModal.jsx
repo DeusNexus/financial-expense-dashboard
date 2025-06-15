@@ -4,7 +4,7 @@ import Modal from 'react-modal';
 import DatePicker from 'react-datepicker';
 import CreatableSelect from 'react-select/creatable';
 import { useApp } from '../../context/AppContext';
-import { CURRENCIES } from '../../utils/constants';
+import { CURRENCIES, EXPENSE_CATEGORIES } from '../../utils/constants';
 import { formatInputNumber, parseInputNumber } from '../../utils/format';
 import OCRUpload from '../OCR/OCRUpload';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -30,7 +30,8 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
 
   // Get existing categories from expenses
   const existingCategories = [...new Set(expenses.map(e => e.category).filter(Boolean))];
-  const categoryOptions = existingCategories.map(cat => ({
+  const allCategories = [...new Set([...EXPENSE_CATEGORIES, ...existingCategories])];
+  const categoryOptions = allCategories.map(cat => ({
     value: cat,
     label: cat
   }));
@@ -106,7 +107,10 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
   };
 
   const handleAmountChange = (e) => {
-    const formatted = formatInputNumber(e.target.value);
+    const value = e.target.value;
+    // Allow only numbers and dots
+    const numericValue = value.replace(/[^\d]/g, '');
+    const formatted = formatInputNumber(numericValue);
     setFormattedAmount(formatted);
     if (errors.amount) {
       setErrors(prev => ({ ...prev, amount: null }));
@@ -128,6 +132,11 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
     const newOption = { value: inputValue, label: inputValue };
     handleInputChange('category', inputValue);
     return newOption;
+  };
+
+  const getCurrencySymbol = (currency) => {
+    const curr = CURRENCIES.find(c => c.code === currency);
+    return curr ? curr.symbol : currency;
   };
 
   return (
@@ -156,24 +165,22 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
               onClick={() => setShowOCR(true)}
               className="btn-secondary"
             >
-              📷 Scan Receipt (Demo)
+              📷 Scan Receipt
             </button>
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="amount">Amount *</label>
-              <div className="amount-input-container">
+              <div className={`amount-input-container ${errors.amount ? 'error' : ''}`}>
                 <span className="currency-prefix">
-                  {formData.currency === 'IDR' ? 'Rp' : 
-                   formData.currency === 'EUR' ? '€' : '$'}
+                  {getCurrencySymbol(formData.currency)}
                 </span>
                 <input
                   id="amount"
                   type="text"
                   value={formattedAmount}
                   onChange={handleAmountChange}
-                  className={errors.amount ? 'error' : ''}
                   placeholder={formData.currency === 'IDR' ? '1.000.000' : '1000.00'}
                 />
               </div>
@@ -199,11 +206,12 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
               <CreatableSelect
                 options={categoryOptions}
                 value={categoryOptions.find(opt => opt.value === formData.category)}
-                onChange={(option) => handleInputChange('category', option.value)}
+                onChange={(option) => handleInputChange('category', option ? option.value : '')}
                 onCreateOption={handleCategoryCreate}
                 className={`select-container ${errors.category ? 'error' : ''}`}
                 classNamePrefix="select"
                 placeholder="Select or create category..."
+                isClearable
               />
               {errors.category && <span className="error-text">{errors.category}</span>}
             </div>
@@ -273,7 +281,7 @@ const ExpenseFormModal = ({ isOpen, onClose, expense = null }) => {
                 onClick={() => handleInputChange('receiptImage', null)}
                 className="remove-image"
               >
-                Remove Image
+                ×
               </button>
             </div>
           )}

@@ -1,3 +1,4 @@
+/* src/components/Dashboard/StatsCards.css */
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -19,20 +20,36 @@
   margin-right: 15px;
 }
 
+.stat-content {
+  flex: 1;
+}
+
 .stat-content h3 {
   margin: 0;
   color: #666;
   font-size: 14px;
 }
 
+.stat-value-container {
+  margin: 5px 0;
+}
+
 .stat-value {
   font-size: 1.5rem;
   font-weight: bold;
-  margin: 5px 0;
+  margin: 0;
+}
+
+.stat-value-secondary {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 2px 0 0 0;
+  font-weight: normal;
 }
 
 .stat-change {
   font-size: 12px;
+  margin: 5px 0 0 0;
 }
 
 .stat-change.positive {
@@ -41,4 +58,20 @@
 
 .stat-change.negative {
   color: red;
+}
+
+@media (max-width: 768px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stat-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
 }

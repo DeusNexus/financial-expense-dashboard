@@ -33,6 +33,10 @@ function App() {
     localStorage.setItem('hasSeenOnboarding', 'true');
   };
 
+  const handleHelpClick = () => {
+    setShowOnboarding(true);
+  };
+
   return (
     <AppProvider>
       <Router>
@@ -41,6 +45,7 @@ function App() {
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
             onSettingsClick={() => setShowSettings(true)}
+            onHelpClick={handleHelpClick}
           />
           
           <main className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>

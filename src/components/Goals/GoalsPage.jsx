@@ -1,5 +1,8 @@
+// src/components/Goals/GoalsPage.jsx
 import React, { useState } from 'react';
+import CreatableSelect from 'react-select/creatable';
 import { useApp } from '../../context/AppContext';
+import { EXPENSE_CATEGORIES } from '../../utils/constants';
 import './GoalsPage.css';
 
 const GoalsPage = () => {
@@ -11,6 +14,14 @@ const GoalsPage = () => {
     targetDate: '',
     category: ''
   });
+
+  // Get existing categories from expenses
+  const existingCategories = [...new Set(expenses.map(e => e.category).filter(Boolean))];
+  const allCategories = [...new Set([...EXPENSE_CATEGORIES, ...existingCategories])];
+  const categoryOptions = allCategories.map(cat => ({
+    value: cat,
+    label: cat
+  }));
 
   const calculateProgress = (goal) => {
     const totalSavings = expenses.reduce((sum, expense) => {
@@ -27,6 +38,10 @@ const GoalsPage = () => {
     });
     setNewGoal({ name: '', targetAmount: '', targetDate: '', category: '' });
     setShowForm(false);
+  };
+
+  const handleCategoryCreate = (inputValue) => {
+    setNewGoal(prev => ({ ...prev, category: inputValue }));
   };
 
   return (
@@ -46,6 +61,7 @@ const GoalsPage = () => {
           <div key={goal.id} className="goal-card">
             <h3>{goal.name}</h3>
             <p>Target: {goal.targetAmount} by {goal.targetDate}</p>
+            {goal.category && <p>Category: {goal.category}</p>}
             <div className="progress-bar">
               <div 
                 className="progress-fill"
@@ -63,32 +79,48 @@ const GoalsPage = () => {
           <div className="modal">
             <h2>Add New Goal</h2>
             <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Goal Name"
-                value={newGoal.name}
-                onChange={(e) => setNewGoal({...newGoal, name: e.target.value})}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Target Amount"
-                value={newGoal.targetAmount}
-                onChange={(e) => setNewGoal({...newGoal, targetAmount: e.target.value})}
-                required
-              />
-              <input
-                type="date"
-                value={newGoal.targetDate}
-                onChange={(e) => setNewGoal({...newGoal, targetDate: e.target.value})}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Category (optional)"
-                value={newGoal.category}
-                onChange={(e) => setNewGoal({...newGoal, category: e.target.value})}
-              />
+              <div className="form-group">
+                <label>Goal Name</label>
+                <input
+                  type="text"
+                  placeholder="Goal Name"
+                  value={newGoal.name}
+                  onChange={(e) => setNewGoal({...newGoal, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Target Amount</label>
+                <input
+                  type="number"
+                  placeholder="Target Amount"
+                  value={newGoal.targetAmount}
+                  onChange={(e) => setNewGoal({...newGoal, targetAmount: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Target Date</label>
+                <input
+                  type="date"
+                  value={newGoal.targetDate}
+                  onChange={(e) => setNewGoal({...newGoal, targetDate: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Category (optional)</label>
+                <CreatableSelect
+                  options={categoryOptions}
+                  value={categoryOptions.find(opt => opt.value === newGoal.category)}
+                  onChange={(option) => setNewGoal({...newGoal, category: option ? option.value : ''})}
+                  onCreateOption={handleCategoryCreate}
+                  className="select-container"
+                  classNamePrefix="select"
+                  placeholder="Select or create category..."
+                  isClearable
+                />
+              </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
                 <button type="submit">Add Goal</button>
