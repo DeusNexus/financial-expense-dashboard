@@ -97,6 +97,41 @@
   background: #c82333;
 }
 
+/* Empty State Styles */
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.empty-state-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.empty-state-card h3 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+}
+
+.empty-state-card p {
+  color: #666;
+  margin: 0 0 25px 0;
+  line-height: 1.6;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -146,5 +181,9 @@
   
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .empty-state-card {
+    padding: 30px 20px;
   }
 }

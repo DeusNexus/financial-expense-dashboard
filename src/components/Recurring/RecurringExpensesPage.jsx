@@ -92,7 +92,19 @@ const RecurringExpensesPage = () => {
       <div className="upcoming-expenses">
         <h2>Upcoming Expenses</h2>
         {upcomingExpenses.length === 0 ? (
-          <p>No recurring expenses set up.</p>
+          <div className="empty-state-container">
+            <div className="empty-state-card">
+              <div className="empty-state-icon">🔄</div>
+              <h3>No Recurring Expenses</h3>
+              <p>You haven't set up any recurring expenses yet. Create your first one to track monthly bills, subscriptions, and other regular payments.</p>
+              <button 
+                className="btn-primary"
+                onClick={() => setShowForm(true)}
+              >
+                Add Your First Recurring Expense
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="expense-list">
             {upcomingExpenses.map(expense => {

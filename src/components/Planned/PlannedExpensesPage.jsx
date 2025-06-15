@@ -80,7 +80,19 @@ const PlannedExpensesPage = () => {
 
       <div className="planned-expenses">
         {sortedPlannedExpenses.length === 0 ? (
-          <p>No planned expenses yet.</p>
+          <div className="empty-state-container">
+            <div className="empty-state-card">
+              <div className="empty-state-icon">📅</div>
+              <h3>No Planned Expenses</h3>
+              <p>Start planning ahead! Add upcoming one-time expenses like vacations, major purchases, or annual payments to better manage your budget.</p>
+              <button 
+                className="btn-primary"
+                onClick={() => setShowForm(true)}
+              >
+                Plan Your First Expense
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="expense-list">
             {sortedPlannedExpenses.map(expense => {
