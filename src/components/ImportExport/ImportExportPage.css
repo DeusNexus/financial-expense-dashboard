@@ -1,0 +1,142 @@
+.import-export-page {
+  padding: 20px;
+  max-width: 800px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.page-header p {
+  color: #666;
+  margin: 0;
+}
+
+.import-export-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.export-section,
+.import-section {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.export-section h2,
+.import-section h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.export-section p,
+.import-section p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.export-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.data-summary {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 4px solid #007bff;
+}
+
+.data-summary p {
+  margin: 0;
+  font-weight: 500;
+  color: #333;
+}
+
+.import-controls {
+  margin-bottom: 20px;
+}
+
+.file-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.file-input:hover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+.loading {
+  text-align: center;
+  padding: 10px;
+  color: #007bff;
+  font-style: italic;
+}
+
+.import-status {
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.import-status.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.import-status.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.import-info {
+  background-color: #e7f3ff;
+  padding: 15px;
+  border-radius: 4px;
+  border-left: 4px solid #007bff;
+}
+
+.import-info h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.import-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.import-info li {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .import-export-sections {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .export-options {
+    flex-direction: column;
+  }
+}
